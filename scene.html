@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="main.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three.js GLB Model</title>
+    <style>
+        body {
+    background-color: #000;
+    padding: 0px;
+    margin: 0; /* Assurez-vous qu'il n'y a pas de marges par défaut */
+    overflow: hidden; /* Évite les barres de défilement */
+}
+
+#Body {
+    text-shadow: 0 0 10px #00FF00;
+    opacity: 1;
+    white-space: normal; /* Permet l'enroulement du texte */
+    max-width: 60ch; /* Limite le nombre de caractères par ligne */
+    margin: 0;
+    line-height: 1.5;
+    color: lightgreen;
+    font-family: Arial, sans-serif;
+    font-size: 1rem;
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    z-index: 10; /* Assure que le texte est au-dessus de la scène 3D */
+
+}
+
+#summary {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: red;
+    font-family: Arial, sans-serif;
+    font-size: 24px;
+    text-align: center;
+    z-index: 10; /* Assure que le texte est au-dessus de la scène 3D */
+}
+    </style>
+</head>
+<body>
+    <div id="summary"></div>
+    <div id="Body"></div>
+    <script type="module">
+        import * as THREE from 'https://cdn.skypack.dev/three@0.133.0/build/three.module.js';
+        import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.133.0/examples/jsm/loaders/GLTFLoader.js';
+        import { AnimationMixer } from 'https://cdn.skypack.dev/three@0.133.0/build/three.module.js';
+        import { EffectComposer } from 'https://cdn.skypack.dev/three@0.133.0/examples/jsm/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'https://cdn.skypack.dev/three@0.133.0/examples/jsm/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'https://cdn.skypack.dev/three@0.133.0/examples/jsm/postprocessing/UnrealBloomPass.js';
+        import { OutlinePass } from 'https://cdn.skypack.dev/pin/three@v0.133.0-bfkaociplXnkPWzSZsbo/mode=imports/unoptimized/examples/jsm/postprocessing/OutlinePass.js';
+
+        let i = 0;
+        let obja;
+        let mixer;
+        let isAnimating = true;
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 5;
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        const composer = new EffectComposer(renderer);
+        const renderPass = new RenderPass(scene, camera);
+        composer.addPass(renderPass);
+
+        const bloomPass = new UnrealBloomPass(
+            new THREE.Vector2(window.innerWidth, window.innerHeight),
+            2, 0.9, 0.1
+        );
+        composer.addPass(bloomPass);
+
+        const outlinePass = new OutlinePass(new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera);
+        outlinePass.edgeStrength = 3.0;
+        outlinePass.edgeThickness = 1.0;
+        composer.addPass(outlinePass);
+
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('click', onClick);
+        window.addEventListener('resize', onWindowResize);
+
+        function onMouseMove(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
+            //get which pill is hovered
+            //get which pill is hovered
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(scene.children, true);
+            if (intersects.length > 0) {
+                const obj = intersects[0].object;
+                if (obj.name === "Circle001" || obj.name === "Circle002") {
+                    outlinePass.selectedObjects = [obj];
+                    //traverse the scene and scale up if it is the right pill
+                    scene.traverse((object) => {
+                        if (object.isMesh) {
+                            object.scale.set(1, 1, 1);
+                            if (object.name === obj.name) {
+                                object.scale.set(1.1, 1.1, 1.1);
+                            }
+                            body.style.display = "block";
+                            if (obj.name === "Circle001") {
+                                body.innerHTML = "If you choose this pill, you choose to dive into the real world, discover the truth and live an adventure that will make you grow.";
+                            } else if (obj.name === "Circle002") {
+                                body.innerHTML = "If you choose this pill, you'll be preserving the magic and wonder of childhood, while discovering an adventure that will rekindle your memories and imagination.";
+                            }
+                        }
+                    });
+                }
+            }
+
+
+        }
+
+        //fait en sote que les ombres soit activées sur les pillules
+        const light = new THREE.DirectionalLight(0xffffff, 3);
+        light.position.set(0, 0, 10);
+        scene.add(light);
+
+
+        const ambientLight = new THREE.AmbientLight(0x404040);
+        ambientLight.intensity = 1;
+        scene.add(ambientLight);
+
+
+
+
+        function onClick() {
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(scene.children, true);
+            if (intersects.length > 0){
+                const obj = intersects[0].object;
+                obja = (obj.name === "Circle001") ? "r" : (obj.name === "Circle002") ? "b" : null;
+                console.log("Object clicked:", obj.name);
+                if (obja) {
+                    stopAnimation(obja);
+                }
+            }
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        
+
+
+        const loader = new GLTFLoader();
+        loader.load('model.glb', function(gltf) {
+            scene.add(gltf.scene);
+
+            gltf.scene.rotation.x = 3 * Math.PI / 5;
+            gltf.scene.rotation.y = -Math.PI / 2;
+            gltf.scene.rotation.z = Math.PI / 2;
+
+            const alight = new THREE.DirectionalLight(0xffffff, 5);
+            alight.position.set(0, 0, 10);
+            scene.add(alight);
+
+            const ambientLight = new THREE.AmbientLight(0x404040);
+            ambientLight.intensity = 1;
+            scene.add(ambientLight);
+
+            gltf.scene.traverse((object) => {
+                if (object.isMesh) {
+                    if (object.name === "Circle001" || object.name === "Circle002") {
+                        object.material = new THREE.MeshBasicMaterial({ color: object.name === "Circle001" ? 0xff0000 : 0x0000ff });
+                        object.layers.enable(1);
+                    } else {
+                        object.layers.enable(0);
+                    }
+                }
+            });
+
+            mixer = new AnimationMixer(gltf.scene);
+
+            const redpillAnim = mixer.clipAction(THREE.AnimationUtils.subclip(gltf.animations[3], 'idle', 0, 78)).setDuration(3);
+            const bluepillAnim = mixer.clipAction(THREE.AnimationUtils.subclip(gltf.animations[2], 'idle', 0, 78)).setDuration(3);
+            redpillAnim.play();
+            bluepillAnim.play();
+
+            const idleAnim = mixer.clipAction(THREE.AnimationUtils.subclip(gltf.animations[1], 'idle', 0, 60)).setDuration(4);
+            idleAnim.clampWhenFinished = true;
+            idleAnim.setLoop(THREE.LoopOnce);
+            idleAnim.play();
+
+            animate();
+        }, undefined, function(error) {
+            console.error('An error occurred while loading the GLB model:', error);
+        });
+
+        function stopAnimation(choice) {
+
+//hide the texte
+        const body = document.getElementById("Body");
+        const summary = document.getElementById("summary");
+        summary.style.display = "none";
+        body.style.display = "none";
+
+
+
+            // Gradually increase the bloom effect
+            while (i < 9) {
+                const bloomPass2 = new UnrealBloomPass(
+                    new THREE.Vector2(window.innerWidth, window.innerHeight),
+                    2, 0.9, 0.1
+                );
+                //delay the bloom effect    
+                setTimeout(() => {
+                    composer.addPass(bloomPass2);
+                }, 10);
+                
+                i++;
+            }
+                setTimeout(() => {
+                window.location.href = `${choice}-pill-end.html`;
+                }, 1000);
+        
+        }
+        //add two texte on a overlay
+        const body = document.getElementById("Body");
+        const summary = document.getElementById("summary");
+        summary.style.display = "block";
+        body.style.display = "block";
+
+        body.innerHTML = "Press on one of the pills to find out more before clicking to choose.";
+        summary.innerHTML = "The Real World Awaits";
+
+
+
+
+        function animate() {
+            if (!isAnimating) return;
+
+            requestAnimationFrame(animate);
+            mixer.update(0.01);
+
+            bloomPass.renderToScreen = true;
+            camera.layers.set(0);
+            composer.render();
+        }
+    </script>
+</body>
+</html>
