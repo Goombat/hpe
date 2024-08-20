@@ -13,54 +13,57 @@
                 opacity: 1;
             }
         }
-        body {#fff
-        }   
 
-
+        body {
+            background-color: #fff;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+        }
 
         .bck {
-            
-            background: linear-gradient(to right, #ff0000, #000000);;
+            background: linear-gradient(to right, #ff0000, #000000);
             color: #000;
-            font-family: 'Arial', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
-            text-align: center;
+            min-height: 100vh;
+            padding: 20px;
             animation: fadeIn 2.5s ease-in;
+            box-sizing: border-box;
         }
+
         .container {
-            max-width: 600px;
+            max-width: 100%; /* Pour que le conteneur utilise toute la largeur sur mobile */
+            width: 600px;
             padding: 20px;
             background-color: rgba(0, 0, 0, 0.7);
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            box-sizing: border-box;
+            text-align: center;
         }
-        h1 {
-            font-size: 2.5em;
-            color:  #ff0000;
 
+        h1 {
+            font-size: 2em; /* Réduction pour les petits écrans */
+            color: #ff0000;
             margin-bottom: 20px;
             text-shadow: 0 0 15px #ff0000;
         }
+
         p {
-            font-size: 1.2em;
+            font-size: 1.1em;
             margin-bottom: 30px;
             font-weight: bolder;
             color: #fff;
-
         }
+
         img {
-            aspect-ratio: 16/9;
-           
-            max-width: 100%;
-            
+            width: 100%; /* S'assure que l'image ne dépasse pas la largeur du conteneur */
+            height: auto; /* Maintient les proportions */
             border-radius: 10px;
             margin-bottom: 30px;
-
         }
+
         button {
             background-color: #ff0000;
             color: #fff;
@@ -71,29 +74,36 @@
             border-radius: 5px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
             transition: background-color 0.3s ease;
+            width: 100%; /* Pour que le bouton prenne toute la largeur sur mobile */
         }
+
         button:hover {
-            background-color: #ff0000;
+            background-color: #cc0000;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.8em; /* Réduction pour les très petits écrans */
+            }
+
+            p {
+                font-size: 1em;
+            }
+
+            button {
+                padding: 15px; /* Ajustement du padding pour mobile */
+            }
         }
     </style>
 </head>
 <body>  
     <div class="bck">
-    <div class="container">
-        <h1>Strong emotions</h1>
-        <p>I bet you did! As an adult, don't let routine deprive you of the thrills of life; it's by stepping out of your comfort zone that you'll discover the true richness of each moment. Every adventure is an opportunity to surpass and reinvent yourself.
- It's now up to you to explore the path ahead... Click to accept your mission and get further instructions.
-</p>
-        <img src="http://hannah-peter.tech/red-pill.png" alt="Red Pill Comfort">
-<button onclick="window.location.href = 'mailto:contact@hannah-peter.tech?subject=The%20Choice%20Is%20Done&body=Hey%0D%0A%0D%0AJust%20wanted%20to%20let%20you%20know%20that%20I%20Choose%20The%20Red%20Gift!%0D%0A%0D%0AYours,%0D%0AAgent%20H.Peter%20%3A%29'">Mission accepted</button>
-        
-    </div>
+        <div class="container">
+            <h1>Strong emotions</h1>
+            <p>I bet you did! As an adult, don't let routine deprive you of the thrills of life. It's by stepping out of your comfort zone that you'll discover the true richness of each moment. Every adventure is an opportunity to surpass and reinvent yourself. It's now up to you to explore the path ahead... Click to accept your mission and get further instructions.</p>
+            <img src="http://hannah-peter.tech/red-pill.png" alt="Red Pill Comfort">
+            <button onclick="window.location.href='mailto:contact@hannah-peter.tech?subject=The%20Choice%20Is%20Done&body=Hey%0D%0A%0D%0AJust%20wanted%20to%20let%20you%20know%20that%20I%20Choose%20The%20Red%20Gift!%0D%0A%0D%0AYours,%0D%0AAgent%20H.Peter%20%3A%29'">Mission accepted</button>
+        </div>
     </div>
 </body>
 </html>
-
-
-        
-        
-        
-        
